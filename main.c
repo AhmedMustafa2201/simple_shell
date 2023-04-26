@@ -65,17 +65,18 @@ void exec_line_command(struct stringArray *arr, struct stat *st,
 {
 	pid_t my_pid;
 
-	if (stat(arr->arr[0], &st) == 0)
+	/* Check whether the path is valid */
+	if (stat(arr->arr[0], st) == 0)
 	{
 		/*FORK CHILD TO EXECUTE in case the path is valid */
-		while (tempIdx < arr->length)
+		while (*tempIdx < arr->length)
 		{
-			if (arr->arr[tempIdx] == NULL)
+			if (arr->arr[*tempIdx] == NULL)
 				printf("NULL\n");
 			else
-				printf("%s\n", arr->arr[tempIdx]);
+				printf("%s\n", arr->arr[*tempIdx]);
 
-			tempIdx++;
+			*tempIdx = *tempIdx + 1;
 		}
 
 		my_pid = fork();
@@ -87,7 +88,7 @@ void exec_line_command(struct stringArray *arr, struct stat *st,
 			sleep(3);
 		}
 		else
-			wait(&status);
+			wait(status);
 	}
 	else
 		printf(" NOT FOUND\n");
@@ -96,11 +97,9 @@ void exec_line_command(struct stringArray *arr, struct stat *st,
 
 /**
  * main - desc
- * @ac: count
- * @av: args
  * Return: 0
  */
-int main(int ac, char **av)
+int main()
 {
 	struct stringArray *arr;
 	int arr_size = 100, tempIdx = 0, status, j = 1;
@@ -130,7 +129,7 @@ int main(int ac, char **av)
 			strcat(arr->arr[0], temp);
 		}
 
-		exec_line_command(arr, st, &tempIdx, &status);
+		exec_line_command(arr, &st, &tempIdx, &status);
 	}
 
 	return (0);
