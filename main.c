@@ -99,7 +99,7 @@ void exec_line_command(struct stringArray *arr, struct stat *st,
  * main - desc
  * Return: 0
  */
-int main()
+int main(void)
 {
 	struct stringArray *arr;
 	int arr_size = 100, tempIdx = 0, status, j = 1;
