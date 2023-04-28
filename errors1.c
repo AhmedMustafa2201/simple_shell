@@ -3,21 +3,22 @@
 
 /**
  * remove_comments - function replaces first
- * @buf: address of the string 
+ * @buf: address of the string
  *
  * Return: Always 0;
  */
 void remove_comments(char *buf)
 {
-        int i;
+	int i;
 
-        for (i = 0; buf[i] != '\0'; i++)
-                if (buf[i] == '#' && (!i || buf[i - 1] == ' '))
-                {
-                        buf[i] = '\0';
-                        break;
-                }
+	for (i = 0; buf[i] != '\0'; i++)
+		if (buf[i] == '#' && (!i || buf[i - 1] == ' '))
+		{
+			buf[i] = '\0';
+			break;
+		}
 }
+
 /**
  * _erratoi - converts a string to an int
  * @s: the string
@@ -29,7 +30,8 @@ int _erratoi(char *s)
 	unsigned long int result = 0;
 
 	if (*s == '+')
-		s++;  
+		s++;
+
 	for (i = 0;  s[i] != '\0'; i++)
 	{
 		if (s[i] >= '0' && s[i] <= '9')
@@ -48,7 +50,7 @@ int _erratoi(char *s)
 /**
  * print_error - prints an
  * @info: t
- * @estr: string containing 
+ * @estr: string containing
  * Return: 0 if no numbers in string
  */
 void print_error(info_t *info, char *estr)
@@ -65,8 +67,7 @@ void print_error(info_t *info, char *estr)
 /**
  * print_d - function prints a decimal
  * @input: the input
- * @fd: the filedescriptor 
- *
+ * @fd: the filedescriptor
  * Return: number of characters printed
  */
 int print_d(int input, int fd)

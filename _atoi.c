@@ -14,7 +14,7 @@ int interactive(info_t *info)
 /**
  * is_delim - checks  delimeter
  * @ch: char
- * @delim: the delimeter 
+ * @delim: the delimeter
  * Return: 1 if true, 0 if false
  */
 int is_delim(char ch, char *delim)
@@ -67,8 +67,8 @@ int _atoi(char *s)
 
 int _isalpha(int ch)
 {
-        if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
-                return (1);
-        else
-                return (0);
+	if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+		return (1);
+	else
+		return (0);
 }
