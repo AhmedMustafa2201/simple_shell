@@ -1,136 +1,45 @@
-#include "main.h"
+#include "shell.h"
 
 /**
- * get_string_array - description here...
- * @arr_size: number of the array list
- * Return: struct stringArray
+ * main - entry point
+ * @ac: arg count
+ * @av: arg vector
+ *
+ * Return: 0 on success, 1 on error
  */
-struct stringArray *get_string_array(int arr_size)
+int main(int ac, char **av)
 {
-	struct stringArray *arr;
+	info_t info[] = { INFO_INIT };
+	int fd = 2;
 
-	arr = malloc(sizeof(stringArray));
-	arr->length = 0;
-	arr->arr = malloc(arr_size * sizeof(char *));
-	return (arr);
-}
+	asm ("mov %1, %0\n\t"
+			"add $3, %0"
+			: "=r" (fd)
+			: "r" (fd));
 
-/**
- * get_and_parse_line - description here...
- * @arr: pointer to the original struct
- * Return nothing
- */
-void get_and_parse_line(struct stringArray *arr)
-{
-	char *portion, *tempStr;
-	int tempSize = 0, tempIdx = 0;
-	char *string = NULL;
-	size_t size = 0;
-
-	getline(&string, &size, stdin);
-
-	/* parsing the string line from user into an array of strings*/
-	portion = strtok(string, " \r\n");
-	while (portion != NULL)
+	if (ac == 2)
 	{
-		while (portion[tempIdx] != '\0')
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			tempSize++;
-			tempIdx++;
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
+			{
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
+				exit(127);
+			}
+			return (EXIT_FAILURE);
 		}
-		tempStr = malloc(sizeof(char) * tempSize);
-		strcpy(tempStr, portion);
-
-		arr->length = arr->length + 1;
-		arr->arr[arr->length - 1] = tempStr;
-		tempIdx = 0;
-		tempSize = 0;
-		tempStr = NULL;
-		portion = strtok(NULL, " \r\n");
+		info->readfd = fd;
 	}
-	arr->arr = realloc(arr->arr, arr->length);
-	arr->arr[arr->length] = NULL;
+	populate_env_list(info);
+	read_history(info);
+	hsh(info, av);
+	return (EXIT_SUCCESS);
 }
 
-/**
- * exec_line_command - execute the wroted cmd line.
- * @arr: struct stringArray
- * @st: struct stat
- * @tempIdx: number for the index
- * @status: passed status from main function
- * Return nothing
- */
-void exec_line_command(struct stringArray *arr, struct stat *st,
-		int *tempIdx, int *status)
-{
-	pid_t my_pid;
-
-	/* Check whether the path is valid */
-	if (stat(arr->arr[0], st) == 0)
-	{
-		/*FORK CHILD TO EXECUTE in case the path is valid */
-		while (*tempIdx < arr->length)
-		{
-			if (arr->arr[*tempIdx] == NULL)
-				printf("NULL\n");
-			else
-				printf("%s\n", arr->arr[*tempIdx]);
-
-			*tempIdx = *tempIdx + 1;
-		}
-
-		my_pid = fork();
-		if (my_pid == 0)
-		{
-			if (execve(arr->arr[0], arr->arr, NULL) == -1)
-				perror("execve");
-
-			sleep(3);
-		}
-		else
-			wait(status);
-	}
-	else
-		printf(" NOT FOUND\n");
-
-}
-
-/**
- * main - desc
- * Return: 0
- */
-int main(void)
-{
-	struct stringArray *arr;
-	int arr_size = 100, tempIdx = 0, status, j = 1;
-	/* pid_t my_pid; */
-	struct stat st;
-
-	/* MAIN LOOP */
-	while (j == 1)
-	{
-		printf("$ ");
-		/* Intialize Array*/
-		arr = get_string_array(arr_size);
-		/*GET LINE AND PARSE IT FOR FUTURE USE*/
-		get_and_parse_line(arr);
-		if (strcmp(arr->arr[0], "exit") == 0)
-			break;
-		if (arr->arr[0][0] != '/')
-		{
-			int len = 0;
-			char *temp = arr->arr[0];
-
-			while (temp[len] != '\0')
-				len++;
-
-			arr->arr[0] = malloc(6 + len);
-			strcat(arr->arr[0], "/bin/");
-			strcat(arr->arr[0], temp);
-		}
-
-		exec_line_command(arr, &st, &tempIdx, &status);
-	}
-
-	return (0);
-}
