@@ -2,7 +2,7 @@
 
 /**
  * interactive - interactive mode
- * @info: struct
+ * @info: struct for info
  *
  * Return: 1 if interactive mode
  */
